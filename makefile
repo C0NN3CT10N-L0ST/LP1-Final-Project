@@ -1,3 +1,4 @@
+CC = gcc
 override CFLAGS += -g -Wvla -Wall -Wpedantic -Wextra -Wdeclaration-after-statement
 
 SRCS = $(shell find . -type f -name '*.c')
@@ -5,7 +6,7 @@ OBJS = $(patsubst %.c, %.o, $(SRCS))
 
 main: $(OBJS)
 	@echo "Compiling program..."
-	gcc $(CFLAGS) main.c -o main -lm
+	$(CC) $(CFLAGS) main.c board.c -o main -lm
 	@echo "Compilation complete!"
 
 clean:
