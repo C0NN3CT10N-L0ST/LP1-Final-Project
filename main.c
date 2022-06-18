@@ -192,7 +192,7 @@ int boardSetup(list *boardCells, int *safeCells, int totalCells) {
         cell->next = NULL;
         
         // Insert new cell onto the board
-        if (insertBoardCell(&boardCells, cell) == 1) {
+        if (insertBoardCell(boardCells, cell) == 1) {
             return 1;
         }
 
