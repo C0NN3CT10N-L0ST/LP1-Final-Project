@@ -14,6 +14,7 @@ int getSafeCellsFromConfigFile(char *fileName, int *safeCells);
 void initializeCellsList(list *boardCells);
 int insertBoardCell(list *boardCells, node *cell);
 int boardSetup(list *boardCells, int *safeCells, int totalCells);
+int checkGameWin(list *boardCells, int totalCells);
 
 
 int main(int argc, char const *argv[])
@@ -24,10 +25,12 @@ int main(int argc, char const *argv[])
     int safeCells[MAX_CELLS] = {0};  // Stores the safe cells read from the config file
     unsigned int totalCells;  // Number of total cells
     list boardCells;  // List struct to store all board cells data
+    char inputOption;  // Stores user input option
+    bool player1;  // Holds the player for the current play
+    unsigned int dicesValue;  // Holds dices value for each move
 
     // Initializes random seed
     srand(1);
-
 
     // Gets program args and checks if they're valid
     for (int i = 1; i < argc; i++) {
@@ -67,14 +70,45 @@ int main(int argc, char const *argv[])
     // Adds cells to board (Board Setup)
     boardSetup(&boardCells, safeCells, totalCells);
     
-    // Prints board
-    boardPrint(linesNum, columnsNum, boardCells, boardPresentationMode);
+    // Prints game info for the first time
+    boardPrint(linesNum, columnsNum, boardCells, boardPresentationMode);  // Prints board
+    showMenu();  // Prints menu
+    player1 = true;  // Sets player 1 as the starting player
 
     // Game Loop
-    /*do {
+    do {
+        // Prints current player move
+        if (player1) {
+            puts(PL1_MOVE);
+        } else {
+            puts(PL2_MOVE);
+        }
 
-    } while ();
-    */
+        // Rolls dices for current player move and prints the value
+        dicesValue = rolldice(2);
+        printf("%s%d\n", PL_DICE, dicesValue);
+        
+        printf(">");  // Input cursor
+        scanf(" %c", &inputOption);  // Reads user input
+
+        switch (inputOption) {
+            case 'h':
+                showMenu();
+                break;
+
+            case 's':
+                // Skips
+                break;
+            
+            default:
+                // TODO
+            
+                break;
+        }
+
+        // Changes player move
+        player1 = !player1;
+    } while (inputOption != 's');
     
     return 0;
 }
@@ -222,4 +256,43 @@ int boardSetup(list *boardCells, int *safeCells, int totalCells) {
     }
 
     return 0;
+}
+
+/**
+ * @brief Checks if any of the two player has already won the game.
+ * @param boardCells Linked list with board cells
+ * @param totalCells The number of total cells
+ * @return Returns 1 if 'Player 1 WON the game', 2 if 'Player 2 WON the game' and 0 if the 'Game still in progress'
+ */
+int checkGameWin(list *boardCells, int totalCells) {
+    int homeP1 = 0;  // Player 1 home
+    int homeP2 = totalCells / 2;  // Player 2 home
+    bool p1Won;  // Player 1 win case
+    bool p2Won;  // Player 2 win case
+
+    node currentNode = *boardCells->head;  // Holds current node being checked
+
+    for (int i = homeP1; i <= homeP2; i++) {
+        if (i == homeP1) {
+            int playerPawn[4] = currentNode.item.jogador_peao[0];
+            p1Won = playerPawn[0] == 'A' && playerPawn[1] == 'B' && playerPawn[2] == 'C' && playerPawn[3] == 'D';
+        }
+
+        if (i == homeP2) {
+            int playerPawn[4] = currentNode.item.jogador_peao[1];
+            p2Won = playerPawn[0] == 'W' && playerPawn[1] == 'X' && playerPawn[2] == 'Y' && playerPawn[3] == 'Z';
+        }
+        
+        // Gets next node
+        currentNode = *currentNode.next;
+    }
+
+    // Checks which player won, if any
+    if (p1Won) {
+        return 1;
+    } else if (p2Won) {
+        return 2;
+    } else {
+        return 0;
+    }
 }
