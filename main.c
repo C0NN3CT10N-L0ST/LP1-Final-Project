@@ -9,6 +9,7 @@
 
 /* Program Functions' Declaration */
 
+void showMenu();
 int getSafeCellsFromConfigFile(char *fileName, int *safeCells);
 void initializeCellsList(list *boardCells);
 int insertBoardCell(list *boardCells, node *cell);
@@ -68,12 +69,32 @@ int main(int argc, char const *argv[])
     
     // Prints board
     boardPrint(linesNum, columnsNum, boardCells, boardPresentationMode);
+
+    // Game Loop
+    /*do {
+
+    } while ();
+    */
     
     return 0;
 }
 
 
 /* Program Functions */
+
+/**
+ * @brief Prints the game menu.
+ *  
+ */
+void showMenu() {
+    puts("+------------------------------------+");
+    puts("|         Nao Te Constipes           |");
+    puts("+------------------------------------+");
+    puts("| <id do peao> (abcd, xyzw)          |");
+    puts("| s - sair                           |");
+    puts("| h - imprimir menu                  |");
+    puts("+------------------------------------+");
+}
 
 /**
  * @brief Gets the board safe cells from the config file given as a program argument
