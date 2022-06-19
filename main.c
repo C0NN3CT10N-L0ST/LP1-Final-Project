@@ -15,6 +15,8 @@ void initializeCellsList(list *boardCells);
 int insertBoardCell(list *boardCells, node *cell);
 int boardSetup(list *boardCells, int *safeCells, int totalCells);
 int checkGameWin(list *boardCells, int totalCells);
+int getPawnNodeIndex(list *boardCells, char pawn);
+void movePawn(list *boardCells, char pawn, int amount);
 
 
 int main(int argc, char const *argv[])
@@ -295,4 +297,67 @@ int checkGameWin(list *boardCells, int totalCells) {
     } else {
         return 0;
     }
+}
+
+/**
+ * @brief Get the Node Index for the given pawn.
+ * @param boardCells Linked list with board cells
+ * @param pawn The given pawn
+ * @return Returns the node index for the given pawn
+ */
+int getPawnNodeIndex(list *boardCells, char pawn) {
+    int playerPos;  // Gets the player position to which the pawn belongs (0 - P1, 1 - P2)
+    int pawnPos;  // Gets the pawn position
+    int nodeIndex = 0;  // Holds the current node index being checked 
+    
+    // Sets 'plaerPos' and 'pawnPos' based on the given 'pawn'
+    switch (pawn) {
+        case 'a':
+            playerPos = 0;
+            pawnPos = 0;
+            break;
+        case 'b':
+            playerPos = 0;
+            pawnPos = 1;
+            break;
+        case 'c':
+            playerPos = 0;
+            pawnPos = 2;
+            break;
+        case 'd':
+            playerPos = 0;
+            pawnPos = 3;
+            break;
+        case 'w':
+            playerPos = 1;
+            pawnPos = 0;
+            break;
+        case 'x':
+            playerPos = 1;
+            pawnPos = 1;
+            break;
+        case 'y':
+            playerPos = 1;
+            pawnPos = 2;
+            break;
+        case 'z':
+            playerPos = 1;
+            pawnPos = 3;
+            break;
+        
+        default:
+            break;
+    }
+    
+    // Iterates over the board cells until it finds the pawn position
+    for (node currentNode = *boardCells->head; currentNode.next != NULL; currentNode = *currentNode.next) {
+        if (currentNode.item.jogador_peao[playerPos][pawnPos] == pawn) {
+            return nodeIndex;
+        }
+        nodeIndex++;
+    }
+}
+
+void movePawn(list *boardCells, char pawn, int amount) {
+    // TODO
 }
