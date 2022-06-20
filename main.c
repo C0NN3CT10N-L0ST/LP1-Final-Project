@@ -16,7 +16,8 @@ int insertBoardCell(list *boardCells, node *cell);
 int boardSetup(list *boardCells, int *safeCells, int totalCells);
 int checkGameWin(list *boardCells, int totalCells);
 int getPawnNodeIndex(list *boardCells, char pawn);
-void movePawn(list *boardCells, char pawn, int amount);
+void movePawn(list *boardCells, char pawn, int pawnIndex, int srcIndex, int destIndex);
+void makePlay(list *boardCells, char pawn, int amount);
 
 
 int main(int argc, char const *argv[])
@@ -358,6 +359,49 @@ int getPawnNodeIndex(list *boardCells, char pawn) {
     }
 }
 
-void movePawn(list *boardCells, char pawn, int amount) {
-    // TODO
+/**
+ * @brief Moves a pawn from a given source to a given destination.
+ * @param boardCells Linked list with board cells
+ * @param pawn The given pawn
+ * @param pawnIndex The index in 'jogador_peao' array inside 'node' for the current pawn
+ * @param srcIndex The index for the node where the pawn currently resides
+ * @param destIndex The index for the node to which the pawn should reside from now on
+ */
+void movePawn(list *boardCells, char pawn, int pawnIndex, int srcIndex, int destIndex) {
+    int playerIndex;
+    // Gets player index to access based on the given pawn
+    if (pawn == 'a' || pawn == 'b' || pawn == 'c' || pawn == 'd') {
+        playerIndex = 0;
+    } else {
+        playerIndex = 1;
+    }
+    
+    int currentIndex;
+    currentIndex = 0;
+
+    for (node *currentNode = boardCells->head; currentNode->next != NULL; currentNode = currentNode->next) {
+        if (currentIndex == srcIndex) {
+            // Removes the pawn from its current position in the board
+            currentNode->item.jogador_peao[playerIndex][pawnIndex] == ' ';
+        }
+
+        // Checks if pawn has gone around the whole board, if that's the case, the pawn must be uppercase
+        if (destIndex >= boardCells->length) {
+            currentNode->item.jogador_peao[playerIndex][pawnIndex] = pawn - 32;
+        }
+
+        // Places the pawn in its new destination
+        if (currentIndex == destIndex) {
+            currentNode->item.jogador_peao[playerIndex][pawnIndex] = pawn;
+        }
+
+        currentIndex++;
+    }
+}
+
+void makePlay(list *boardCells, char pawn, int amount) {
+    // Gets current pawn node index
+    int pawnCurrentNode = getPawnNodeIndex(boardCells, pawn);
+
+    // Checks if the current pawn 
 }
