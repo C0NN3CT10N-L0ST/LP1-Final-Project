@@ -371,6 +371,8 @@ int getPawnNodeIndex(list *boardCells, char pawn) {
  */
 void movePawn(list *boardCells, char pawn, int pawnIndex, int srcIndex, int destIndex) {
     int playerIndex;
+    int currentIndex = 0;
+    
     // Gets player index to access based on the given pawn
     if (pawn == 'a' || pawn == 'b' || pawn == 'c' || pawn == 'd') {
         playerIndex = 0;
@@ -378,8 +380,6 @@ void movePawn(list *boardCells, char pawn, int pawnIndex, int srcIndex, int dest
         playerIndex = 1;
     }
     
-    int currentIndex;
-    currentIndex = 0;
 
     for (node *currentNode = boardCells->head; currentNode->next != NULL; currentNode = currentNode->next) {
         if (currentIndex == srcIndex) {
