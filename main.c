@@ -352,11 +352,13 @@ int getPawnNodeIndex(list *boardCells, char pawn) {
     
     // Iterates over the board cells until it finds the pawn position
     for (node currentNode = *boardCells->head; currentNode.next != NULL; currentNode = *currentNode.next) {
-        if (currentNode.item.jogador_peao[playerPos][pawnPos] == pawn) {
+        if ((char) currentNode.item.jogador_peao[playerPos][pawnPos] == pawn) {
             return nodeIndex;
         }
         nodeIndex++;
     }
+
+    return -1;
 }
 
 /**
