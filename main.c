@@ -271,20 +271,20 @@ int boardSetup(list *boardCells, int *safeCells, int totalCells) {
 int checkGameWin(list *boardCells, int totalCells) {
     int homeP1 = 0;  // Player 1 home
     int homeP2 = totalCells / 2;  // Player 2 home
-    bool p1Won;  // Player 1 win case
-    bool p2Won;  // Player 2 win case
+    bool p1Won = true;  // Player 1 win case
+    bool p2Won = true;  // Player 2 win case
 
     node currentNode = *boardCells->head;  // Holds current node being checked
 
-    for (int i = homeP1; i <= homeP2; i++) {
-        if (i == homeP1) {
-            int playerPawn[4] = currentNode.item.jogador_peao[0];
-            p1Won = playerPawn[0] == 'A' && playerPawn[1] == 'B' && playerPawn[2] == 'C' && playerPawn[3] == 'D';
-        }
+    for (int player = homeP1; player <= homeP2; player++) {
+        for (int pawnIdx = 0; pawnIdx < 4; pawnIdx++) {
+            if (player == 0 && currentNode.item.jogador_peao[player][pawnIdx] != WIN) {
+                p1Won = false;
+            }
 
-        if (i == homeP2) {
-            int playerPawn[4] = currentNode.item.jogador_peao[1];
-            p2Won = playerPawn[0] == 'W' && playerPawn[1] == 'X' && playerPawn[2] == 'Y' && playerPawn[3] == 'Z';
+            if (player == 1 && currentNode.item.jogador_peao[player][pawnIdx] != WIN) {
+                p2Won = false;
+            }
         }
         
         // Gets next node
