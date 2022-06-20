@@ -386,17 +386,17 @@ void movePawn(list *boardCells, char pawn, int pawnIndex, int srcIndex, int dest
     for (node *currentNode = boardCells->head; currentNode->next != NULL; currentNode = currentNode->next) {
         if (currentIndex == srcIndex) {
             // Removes the pawn from its current position in the board
-            currentNode->item.jogador_peao[playerIndex][pawnIndex] == ' ';
+            currentNode->item.jogador_peao[playerIndex][pawnIndex] == FALSE;
         }
 
         // Checks if pawn has gone around the whole board, if that's the case, the pawn must be uppercase
         if (destIndex >= boardCells->length) {
-            currentNode->item.jogador_peao[playerIndex][pawnIndex] = pawn - 32;
+            currentNode->item.jogador_peao[playerIndex][pawnIndex] = WIN;
         }
 
         // Places the pawn in its new destination
         if (currentIndex == destIndex) {
-            currentNode->item.jogador_peao[playerIndex][pawnIndex] = pawn;
+            currentNode->item.jogador_peao[playerIndex][pawnIndex] = TRUE;
         }
 
         currentIndex++;
