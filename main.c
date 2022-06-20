@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include "board.h"
 
@@ -372,7 +373,7 @@ int getPawnNodeIndex(list *boardCells, char pawn) {
 void movePawn(list *boardCells, char pawn, int pawnIndex, int srcIndex, int destIndex) {
     int playerIndex;
     int currentIndex = 0;
-    
+
     // Gets player index to access based on the given pawn
     if (pawn == 'a' || pawn == 'b' || pawn == 'c' || pawn == 'd') {
         playerIndex = 0;
@@ -380,6 +381,7 @@ void movePawn(list *boardCells, char pawn, int pawnIndex, int srcIndex, int dest
         playerIndex = 1;
     }
     
+    // TODO: fix this
 
     for (node *currentNode = boardCells->head; currentNode->next != NULL; currentNode = currentNode->next) {
         if (currentIndex == srcIndex) {
@@ -402,8 +404,49 @@ void movePawn(list *boardCells, char pawn, int pawnIndex, int srcIndex, int dest
 }
 
 void makePlay(list *boardCells, char pawn, int amount) {
-    // Gets current pawn node index
-    int pawnCurrentNode = getPawnNodeIndex(boardCells, pawn);
+    int playerIndex;
+    int homeOpponent;
+    int currentIndex = 0;  // Stores current node index
+    int pawnIndex;  // Stores the index of the pawn in the cell
+    char playerSymbols[10];  // Stores string with player symbols
 
-    // Checks if the current pawn 
+    // Gets current pawn node index
+    int pawnCurrentPos = getPawnNodeIndex(boardCells, pawn);
+
+    // Gets player index based on pawn, sets 'playerSymbols' based on it, as well as 'homeOpponent'
+    if (pawn == 'a' || pawn == 'b' || pawn == 'c' || pawn == 'd') {
+        playerIndex = 0;
+        strcpy(playerSymbols, SYMBOLS_J1);
+        homeOpponent = boardCells->length / 2;
+    } else {
+        playerIndex = 1;
+        strcpy(playerSymbols, SYMBOLS_J2);
+        homeOpponent = 0;
+    }
+
+    // Gets pawn index in the cell
+    for (pawnIndex = 1; pawnIndex < 5; pawnIndex++) {
+        if (SYMBOLS_J1[pawnIndex] == pawn || SYMBOLS_J2[pawnIndex] == pawn) {
+            break;
+        }
+    }
+
+    // Moves the chosen 'pawn' to its destination based on 'amount' (dices value)
+    movePawn(boardCells, pawn, pawnIndex, pawnCurrentPos, pawnCurrentPos + amount);
+
+    /* 
+        Checks every board cell that the current pawn will go through.
+        If the cell is not a safe cell, moves all the other player
+        cell to his home cell.
+    */
+    for (node *currentNode = boardCells->head; currentNode->next != NULL; currentNode = currentNode->next) {
+        if (currentIndex > pawnCurrentPos && currentIndex <= pawnCurrentPos + amount) {
+            // Checks if the current node has any of the opponnent players pawns
+            for (int symbol = 1; symbol < 5; symbol++) {
+                if (currentNode->item.jogador_peao[playerIndex][symbol-1] == playerSymbols[symbol]) {
+                    movePawn(boardCells, playerSymbols[symbol], symbol-1, currentIndex, homeOpponent);
+                }
+            }
+        }
+    }
 }
