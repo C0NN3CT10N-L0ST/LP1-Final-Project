@@ -216,8 +216,8 @@ int boardSetup(list *boardCells, int *safeCells, int totalCells) {
         // Adds data to new place
         if (cellIndex == 0) {  // Initializes home cell for player 1
             for (letterIdx = 0; letterIdx <= 3; letterIdx++) {
-                place->jogador_peao[0][letterIdx] = 1;
-                place->jogador_peao[1][letterIdx] = 0;
+                place->jogador_peao[0][letterIdx] = TRUE;
+                place->jogador_peao[1][letterIdx] = FALSE;
             }
 
             // Sets home cells as safe cells
@@ -225,24 +225,24 @@ int boardSetup(list *boardCells, int *safeCells, int totalCells) {
 
         } else if (cellIndex == (totalCells / 2)) {  // Initializes home cell for player 2
             for (letterIdx = 0; letterIdx <= 3; letterIdx++) {
-                place->jogador_peao[1][letterIdx] = 1;
-                place->jogador_peao[0][letterIdx] = 0;
+                place->jogador_peao[1][letterIdx] = TRUE;
+                place->jogador_peao[0][letterIdx] = FALSE;
             }
 
             // Sets home cells as safe cells
-            place->casaSegura = 1;
+            place->casaSegura = TRUE;
         } else {
             // Initializes safe cells given in the config file
-            if (safeCells[cellIndex] == 1) {
-                place->casaSegura = 1;
+            if (safeCells[cellIndex] == TRUE) {
+                place->casaSegura = TRUE;
             } else {
-                place->casaSegura = 0;
+                place->casaSegura = FALSE;
             }
 
             // Cleans all the other player cells
             for (letterIdx = 0; letterIdx <= 3; letterIdx++) {
-                place->jogador_peao[0][letterIdx] = 0;
-                place->jogador_peao[1][letterIdx] = 0;
+                place->jogador_peao[0][letterIdx] = FALSE;
+                place->jogador_peao[1][letterIdx] = FALSE;
             }
         }
 
