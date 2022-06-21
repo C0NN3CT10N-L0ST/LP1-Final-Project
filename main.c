@@ -421,6 +421,12 @@ void movePawn(list *boardCells, char pawn, int pawnIndex, int srcIndex, int dest
     }
 }
 
+/**
+ * @brief Makes the play based on the given pawn and the amount of cells it should advance.
+ * @param boardCells Linked list with board cells
+ * @param pawn The given pawn
+ * @param amount The amount of cells the pawn should advance (based on dices value)
+ */
 void makePlay(list *boardCells, char pawn, int amount) {
     int playerIndex;
     int homeOpponent;
@@ -443,11 +449,7 @@ void makePlay(list *boardCells, char pawn, int amount) {
     }
 
     // Gets pawn index in the cell
-    for (pawnIndex = 1; pawnIndex < 5; pawnIndex++) {
-        if (SYMBOLS_J1[pawnIndex] == pawn || SYMBOLS_J2[pawnIndex] == pawn) {
-            break;
-        }
-    }
+    pawnIndex = getPawnIndex(pawn);
 
     // Moves the chosen 'pawn' to its destination based on 'amount' (dices value)
     movePawn(boardCells, pawn, pawnIndex, pawnCurrentPos, pawnCurrentPos + amount);
