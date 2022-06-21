@@ -512,20 +512,25 @@ void makePlay(list *boardCells, char pawn, int amount) {
  */
 bool pawnCompletesLapInCurrentPlay(int player, int totalCells, int srcIndex, int destIndex, int finalDestIndex) {
     // P1
+    // If 'destIndex' exceeds board length, then pawn completes a lap
     if (player == 0 && destIndex >= totalCells) {
         return true;
     }
 
     // P2
-    // if (player == 1 && destIndex >= totalCells && finalDestIndex >= totalCells / 2) {
-    //     return true;
-    // }
-
     if (player == 1) {
+        /* 
+            If pawn 'srcIndex' is between 0 (inclusive) and P2 home (exclusive) 
+            and 'finalDestIndex' exceeds P2 home, then pawn completes lap
+        */
         if ((srcIndex < totalCells / 2 && srcIndex >= 0) && finalDestIndex >= totalCells / 2) {
             return true;
         }
 
+        /*
+            If pawn 'srcIndex' is different from the above, then we just need to check if
+            the pawn completes a lap by checking if 'finalDestIndex' is greater than P2 home
+        */
         if (destIndex >= totalCells && finalDestIndex >= totalCells / 2) {
             return true;
         }
