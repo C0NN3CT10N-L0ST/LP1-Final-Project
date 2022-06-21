@@ -15,12 +15,13 @@ int getSafeCellsFromConfigFile(char *fileName, int *safeCells);
 void initializeCellsList(list *boardCells);
 int insertBoardCell(list *boardCells, node *cell);
 int boardSetup(list *boardCells, int *safeCells, int totalCells);
-bool validPawn(char pawn);
+bool validPawn(char pawn, bool player1);
 int checkGameWin(list *boardCells, int totalCells);
 int getPawnIndex(char pawn);
 int getPawnNodeIndex(list *boardCells, char pawn);
 void movePawn(list *boardCells, char pawn, int pawnIndex, int srcIndex, int destIndex);
 void makePlay(list *boardCells, char pawn, int amount);
+bool pawnCompletesLapInCurrentPlay(int player, int totalCells, int srcIndex, int destIndex, int finalDestIndex);
 
 
 int main(int argc, char const *argv[])
@@ -108,8 +109,11 @@ int main(int argc, char const *argv[])
             
             default:
                 // Checks if the inserted pawn is valid
-                if (validPawn(inputOption)) {
+                if (validPawn(inputOption, player1)) {
                     makePlay(&boardCells, inputOption, dicesValue);
+
+                    // Changes player move after previous play is finished
+                    player1 = !player1;
                 } else {
                     // Invalid option ERROR message
                     puts(INVAL_MOVE);
@@ -121,8 +125,6 @@ int main(int argc, char const *argv[])
         // Prints the board again after the play
         boardPrint(linesNum, columnsNum, boardCells, boardPresentationMode);  // Prints board
 
-        // Changes player move
-        player1 = !player1;
     } while (inputOption != 's');
     
     return 0;
@@ -274,13 +276,18 @@ int boardSetup(list *boardCells, int *safeCells, int totalCells) {
 }
 
 /**
- * @brief Returns whether the given pawn is a valid pawn or not. 
+ * @brief Returns whether the given pawn is a valid pawn or not based on the player of the current play. 
  * @param pawn The given pawn
+ * @param player Whether it is player 1 or not
  * @return Returns whether the given pawn is valid or not
  */
-bool validPawn(char pawn) {
-    for (int i = 0; i < 4; i++) {
-        if (SYMBOLS_J1[i] == pawn || SYMBOLS_J2[i] == pawn) {
+bool validPawn(char pawn, bool player1) {
+    for (int i = 1; i < 5; i++) {
+        if (player1 == true && SYMBOLS_J1[i] == pawn) {
+            return true;
+        }
+
+        if (player1 == false && SYMBOLS_J2[i] == pawn) {
             return true;
         }
     }
@@ -357,7 +364,8 @@ int getPawnIndex(char pawn) {
 int getPawnNodeIndex(list *boardCells, char pawn) {
     int playerPos;  // Gets the player position to which the pawn belongs (0 - P1, 1 - P2)
     int pawnPos;  // Gets the pawn position
-    int nodeIndex = 0;  // Holds the current node index being checked 
+    int nodeIndex;  // Holds the current node index being checked
+    node currentNode = *boardCells->head; // Holds the current node being checked 
     
     // Sets 'playerPos' based on the given 'pawn'
     if (pawn >= 97 && pawn <= 100) {
@@ -370,11 +378,11 @@ int getPawnNodeIndex(list *boardCells, char pawn) {
     pawnPos = getPawnIndex(pawn);
     
     // Iterates over the board cells until it finds the pawn position
-    for (node currentNode = *boardCells->head; currentNode.next != NULL; currentNode = *currentNode.next) {
+    for (nodeIndex = 0; nodeIndex < boardCells->length; nodeIndex++) {
         if ((char) currentNode.item.jogador_peao[playerPos][pawnPos] == TRUE) {
             return nodeIndex;
         }
-        nodeIndex++;
+        currentNode = *currentNode.next;
     }
 
     return -1;
@@ -390,7 +398,14 @@ int getPawnNodeIndex(list *boardCells, char pawn) {
  */
 void movePawn(list *boardCells, char pawn, int pawnIndex, int srcIndex, int destIndex) {
     int playerIndex;
-    int currentIndex = 0;
+    int currentIndex;
+    node *currentNode = boardCells->head;
+    int homeP1 = 0;
+    int homeP2 = boardCells->length / 2;
+    int totalCells = boardCells->length;
+    int destIndexP2;
+    int finalDestIndex = destIndex;
+    bool completesLap;
 
     // Gets player index to access based on the given pawn
     if (pawn == 'a' || pawn == 'b' || pawn == 'c' || pawn == 'd') {
@@ -398,26 +413,42 @@ void movePawn(list *boardCells, char pawn, int pawnIndex, int srcIndex, int dest
     } else {
         playerIndex = 1;
     }
-    
-    // TODO: fix this
 
-    for (node *currentNode = boardCells->head; currentNode->next != NULL; currentNode = currentNode->next) {
+    // Calculates destination index for P2
+    if (playerIndex == 1) {
+        destIndexP2 = destIndex >= totalCells ? destIndex - totalCells : destIndex;
+        finalDestIndex = destIndexP2;
+    }
+
+    // Checks if pawn completes lap in current play
+    completesLap = pawnCompletesLapInCurrentPlay(playerIndex, boardCells->length, srcIndex, destIndex, finalDestIndex);
+
+    for (currentIndex = 0; currentIndex < boardCells->length; currentIndex++) {
         if (currentIndex == srcIndex) {
             // Removes the pawn from its current position in the board
             currentNode->item.jogador_peao[playerIndex][pawnIndex] = FALSE;
         }
 
-        // Checks if pawn has gone around the whole board, if that's the case, the pawn must be uppercase
-        if (destIndex >= boardCells->length) {
+        /* 
+            Checks if pawn has gone around the whole board, if that's the case, 
+            the pawn must be moved to its home cell and converted to uppercase
+        */
+        // Win case for P1
+        if (completesLap && playerIndex == 0 && currentIndex == homeP1) {
             currentNode->item.jogador_peao[playerIndex][pawnIndex] = WIN;
         }
-
-        // Places the pawn in its new destination
-        if (currentIndex == destIndex) {
+        
+        // Win case for P2
+        if (completesLap && playerIndex == 1 && currentIndex == homeP2) {
+            currentNode->item.jogador_peao[playerIndex][pawnIndex] = WIN;
+        }
+        
+        if (!completesLap && currentIndex == finalDestIndex) {  // Places the pawn in its new destination
             currentNode->item.jogador_peao[playerIndex][pawnIndex] = TRUE;
         }
 
-        currentIndex++;
+        // Gets next node
+        currentNode = currentNode->next;
     }
 }
 
@@ -457,16 +488,48 @@ void makePlay(list *boardCells, char pawn, int amount) {
     /* 
         Checks every board cell that the current pawn will go through.
         If the cell is not a safe cell, moves all the other player
-        cell to his home cell.
+        cells to his home cell.
     */
     for (node *currentNode = boardCells->head; currentNode->next != NULL; currentNode = currentNode->next) {
         if (currentIndex > pawnCurrentPos && currentIndex <= pawnCurrentPos + amount) {
             // Checks if the current node has any of the opponnent players pawns
             for (int symbol = 0; symbol < 4; symbol++) {
                 if (currentNode->item.jogador_peao[playerIndex][symbol] == TRUE) {
-                    movePawn(boardCells, playerSymbols[symbol+1], symbol, currentIndex, homeOpponent);
+                    //movePawn(boardCells, playerSymbols[symbol+1], symbol, currentIndex, homeOpponent);
                 }
             }
         }
+        currentIndex++;
     }
+}
+
+/**
+ * @brief Returns whether the pawn will complete a lap in the current play.
+ * @param player The current player ('0' - P1, '1' - P2)
+ * @param srcIndex The current pawn node index
+ * @param destIndex The pawn destination node index
+ * @return Returns whether the pawn completes a lap in the current play 
+ */
+bool pawnCompletesLapInCurrentPlay(int player, int totalCells, int srcIndex, int destIndex, int finalDestIndex) {
+    // P1
+    if (player == 0 && destIndex >= totalCells) {
+        return true;
+    }
+
+    // P2
+    // if (player == 1 && destIndex >= totalCells && finalDestIndex >= totalCells / 2) {
+    //     return true;
+    // }
+
+    if (player == 1) {
+        if ((srcIndex < totalCells / 2 && srcIndex >= 0) && finalDestIndex >= totalCells / 2) {
+            return true;
+        }
+
+        if (destIndex >= totalCells && finalDestIndex >= totalCells / 2) {
+            return true;
+        }
+    }
+
+    return false;
 }
