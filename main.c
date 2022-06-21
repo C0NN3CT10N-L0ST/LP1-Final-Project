@@ -556,12 +556,14 @@ bool isPawnMovable(char pawn, list *boardCells, bool player1) {
     int homeP2 = boardCells->length / 2;
     node currentNode = *boardCells->head;
 
-    if (player == 0) {
-
+    if (player1) {
+        if (currentNode.item.jogador_peao[0][pawnIndex] != WIN) {
+            return true;
+        }
     } else {
         for (int pos = homeP1; pos <= homeP2; pos++) {
             // If the pawn is not uppercase then its moveable
-            if (pos == homeP2 && currentNode.item.jogador_peao[player][pawnIndex] != WIN) {
+            if (pos == homeP2 && currentNode.item.jogador_peao[1][pawnIndex] != WIN) {
                 return true;
             }
 
@@ -569,4 +571,5 @@ bool isPawnMovable(char pawn, list *boardCells, bool player1) {
             currentNode = *currentNode.next;
         }
     }
+    return false;
 }
