@@ -22,6 +22,7 @@ int getPawnNodeIndex(list *boardCells, char pawn);
 void movePawn(list *boardCells, char pawn, int pawnIndex, int srcIndex, int destIndex);
 void makePlay(list *boardCells, char pawn, int amount);
 bool pawnCompletesLapInCurrentPlay(int player, int totalCells, int srcIndex, int destIndex, int finalDestIndex);
+// bool isPawnMovable(int pawn);
 
 
 int main(int argc, char const *argv[])
@@ -165,6 +166,9 @@ int getSafeCellsFromConfigFile(char *fileName, int *safeCells) {
         fputs(FILE_ERR1, stdout);
         return 1;
     }
+
+    // Prints message upon opening the file to be read
+    printf("fich %s\n", fileName);
 
     // Reads all numbers from config file and stores them in 'safeCells'
     while (fscanf(fp, "%d", &numberRead) != EOF && numberRead < MAX_CELLS) {
