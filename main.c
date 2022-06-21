@@ -359,44 +359,15 @@ int getPawnNodeIndex(list *boardCells, char pawn) {
     int pawnPos;  // Gets the pawn position
     int nodeIndex = 0;  // Holds the current node index being checked 
     
-    // Sets 'plaerPos' and 'pawnPos' based on the given 'pawn'
-    switch (pawn) {
-        case 'a':
-            playerPos = 0;
-            pawnPos = 0;
-            break;
-        case 'b':
-            playerPos = 0;
-            pawnPos = 1;
-            break;
-        case 'c':
-            playerPos = 0;
-            pawnPos = 2;
-            break;
-        case 'd':
-            playerPos = 0;
-            pawnPos = 3;
-            break;
-        case 'w':
-            playerPos = 1;
-            pawnPos = 0;
-            break;
-        case 'x':
-            playerPos = 1;
-            pawnPos = 1;
-            break;
-        case 'y':
-            playerPos = 1;
-            pawnPos = 2;
-            break;
-        case 'z':
-            playerPos = 1;
-            pawnPos = 3;
-            break;
-        
-        default:
-            break;
+    // Sets 'playerPos' based on the given 'pawn'
+    if (pawn >= 97 && pawn <= 100) {
+        playerPos = 0;
+    } else {
+        playerPos = 1;
     }
+
+    // Sets 'pawnPos' based on the given 'pawn'
+    pawnPos = getPawnIndex(pawn);
     
     // Iterates over the board cells until it finds the pawn position
     for (node currentNode = *boardCells->head; currentNode.next != NULL; currentNode = *currentNode.next) {
