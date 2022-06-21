@@ -124,7 +124,9 @@ int main(int argc, char const *argv[])
         }
 
         // Prints the board again after the play
-        boardPrint(linesNum, columnsNum, boardCells, boardPresentationMode);  // Prints board
+        if (inputOption != 's') {
+            boardPrint(linesNum, columnsNum, boardCells, boardPresentationMode);  // Prints board
+        }
 
     } while (inputOption != 's');
     
