@@ -22,7 +22,7 @@ int getPawnNodeIndex(list *boardCells, char pawn);
 void movePawn(list *boardCells, char pawn, int pawnIndex, int srcIndex, int destIndex);
 void makePlay(list *boardCells, char pawn, int amount);
 bool pawnCompletesLapInCurrentPlay(int player, int totalCells, int srcIndex, int destIndex, int finalDestIndex);
-bool isPawnMovable(char pawn, list *boardCells, int player);
+bool isPawnMovable(char pawn, list *boardCells, bool player);
 
 
 int main(int argc, char const *argv[])
@@ -110,7 +110,7 @@ int main(int argc, char const *argv[])
             
             default:
                 // Checks if the inserted pawn is valid
-                if (validPawn(inputOption, player1)) {
+                if (validPawn(inputOption, player1) && isPawnMovable(inputOption, &boardCells, player1)) {
                     makePlay(&boardCells, inputOption, dicesValue);
 
                     // Changes player move after previous play is finished
@@ -547,10 +547,10 @@ bool pawnCompletesLapInCurrentPlay(int player, int totalCells, int srcIndex, int
  * @brief Returns whether a pawn is moveable or not.
  * @param pawn The given pawn
  * @param boardCells Linked list with board cells
- * @param player The current player ('0' - P1, '1' - P2)
+ * @param player The current player (P1 - 'true', P2 - 'false')
  * @return Returns whether pawn is moveable
  */
-bool isPawnMovable(char pawn, list *boardCells, int player) {
+bool isPawnMovable(char pawn, list *boardCells, bool player1) {
     int pawnIndex = getPawnIndex(pawn);
     int homeP1 = 0;
     int homeP2 = boardCells->length / 2;
