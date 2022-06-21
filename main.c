@@ -15,6 +15,7 @@ int getSafeCellsFromConfigFile(char *fileName, int *safeCells);
 void initializeCellsList(list *boardCells);
 int insertBoardCell(list *boardCells, node *cell);
 int boardSetup(list *boardCells, int *safeCells, int totalCells);
+bool validPawn(char pawn);
 int checkGameWin(list *boardCells, int totalCells);
 int getPawnNodeIndex(list *boardCells, char pawn);
 void movePawn(list *boardCells, char pawn, int pawnIndex, int srcIndex, int destIndex);
@@ -109,6 +110,9 @@ int main(int argc, char const *argv[])
             
                 break;
         }
+
+        // Prints the board again after the play
+        boardPrint(linesNum, columnsNum, boardCells, boardPresentationMode);  // Prints board
 
         // Changes player move
         player1 = !player1;
@@ -263,6 +267,20 @@ int boardSetup(list *boardCells, int *safeCells, int totalCells) {
 }
 
 /**
+ * @brief Returns whether the given pawn is a valid pawn or not. 
+ * @param pawn The given pawn
+ * @return Returns whether the given pawn is valid or not
+ */
+bool validPawn(char pawn) {
+    for (int i = 0; i < 4; i++) {
+        if (SYMBOLS_J1[i] == pawn || SYMBOLS_J2[i] == pawn) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
  * @brief Checks if any of the two player has already won the game.
  * @param boardCells Linked list with board cells
  * @param totalCells The number of total cells
@@ -386,7 +404,7 @@ void movePawn(list *boardCells, char pawn, int pawnIndex, int srcIndex, int dest
     for (node *currentNode = boardCells->head; currentNode->next != NULL; currentNode = currentNode->next) {
         if (currentIndex == srcIndex) {
             // Removes the pawn from its current position in the board
-            currentNode->item.jogador_peao[playerIndex][pawnIndex] == FALSE;
+            currentNode->item.jogador_peao[playerIndex][pawnIndex] = FALSE;
         }
 
         // Checks if pawn has gone around the whole board, if that's the case, the pawn must be uppercase
@@ -442,9 +460,9 @@ void makePlay(list *boardCells, char pawn, int amount) {
     for (node *currentNode = boardCells->head; currentNode->next != NULL; currentNode = currentNode->next) {
         if (currentIndex > pawnCurrentPos && currentIndex <= pawnCurrentPos + amount) {
             // Checks if the current node has any of the opponnent players pawns
-            for (int symbol = 1; symbol < 5; symbol++) {
-                if (currentNode->item.jogador_peao[playerIndex][symbol-1] == playerSymbols[symbol]) {
-                    movePawn(boardCells, playerSymbols[symbol], symbol-1, currentIndex, homeOpponent);
+            for (int symbol = 0; symbol < 4; symbol++) {
+                if (currentNode->item.jogador_peao[playerIndex][symbol] == TRUE) {
+                    movePawn(boardCells, playerSymbols[symbol+1], symbol, currentIndex, homeOpponent);
                 }
             }
         }
