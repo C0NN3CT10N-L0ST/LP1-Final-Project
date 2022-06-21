@@ -22,7 +22,7 @@ int getPawnNodeIndex(list *boardCells, char pawn);
 void movePawn(list *boardCells, char pawn, int pawnIndex, int srcIndex, int destIndex);
 void makePlay(list *boardCells, char pawn, int amount);
 bool pawnCompletesLapInCurrentPlay(int player, int totalCells, int srcIndex, int destIndex, int finalDestIndex);
-// bool isPawnMovable(int pawn);
+bool isPawnMovable(char pawn, list *boardCells, int player);
 
 
 int main(int argc, char const *argv[])
@@ -541,4 +541,32 @@ bool pawnCompletesLapInCurrentPlay(int player, int totalCells, int srcIndex, int
     }
 
     return false;
+}
+
+/**
+ * @brief Returns whether a pawn is moveable or not.
+ * @param pawn The given pawn
+ * @param boardCells Linked list with board cells
+ * @param player The current player ('0' - P1, '1' - P2)
+ * @return Returns whether pawn is moveable
+ */
+bool isPawnMovable(char pawn, list *boardCells, int player) {
+    int pawnIndex = getPawnIndex(pawn);
+    int homeP1 = 0;
+    int homeP2 = boardCells->length / 2;
+    node currentNode = *boardCells->head;
+
+    if (player == 0) {
+
+    } else {
+        for (int pos = homeP1; pos <= homeP2; pos++) {
+            // If the pawn is not uppercase then its moveable
+            if (pos == homeP2 && currentNode.item.jogador_peao[player][pawnIndex] != WIN) {
+                return true;
+            }
+
+            // Gets next node
+            currentNode = *currentNode.next;
+        }
+    }
 }
