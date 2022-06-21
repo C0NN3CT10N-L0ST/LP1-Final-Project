@@ -17,6 +17,7 @@ int insertBoardCell(list *boardCells, node *cell);
 int boardSetup(list *boardCells, int *safeCells, int totalCells);
 bool validPawn(char pawn);
 int checkGameWin(list *boardCells, int totalCells);
+int getPawnIndex(char pawn);
 int getPawnNodeIndex(list *boardCells, char pawn);
 void movePawn(list *boardCells, char pawn, int pawnIndex, int srcIndex, int destIndex);
 void makePlay(list *boardCells, char pawn, int amount);
@@ -106,7 +107,13 @@ int main(int argc, char const *argv[])
                 break;
             
             default:
-                // TODO
+                // Checks if the inserted pawn is valid
+                if (validPawn(inputOption)) {
+                    makePlay(&boardCells, inputOption, dicesValue);
+                } else {
+                    // Invalid option ERROR message
+                    puts(INVAL_MOVE);
+                }
             
                 break;
         }
@@ -320,6 +327,28 @@ int checkGameWin(list *boardCells, int totalCells) {
 }
 
 /**
+ * @brief Gets the index of the given pawn in the cell.
+ * @param pawn The given pawn 
+ * @return Returns the index of the given pawn. If the pawn is not valid returns -1.
+ */
+int getPawnIndex(char pawn) {
+    int index;
+    if (pawn == 'a' || pawn == 'w') {
+        index = 0;
+    } else if (pawn == 'b' || pawn == 'x') {
+        index = 1;
+    } else if (pawn == 'c' || pawn == 'y') {
+        index = 2;
+    } else if (pawn == 'd' || pawn == 'z') {
+        index = 3;
+    } else {
+        index = -1;
+    }
+
+    return index;
+}
+
+/**
  * @brief Get the Node Index for the given pawn.
  * @param boardCells Linked list with board cells
  * @param pawn The given pawn
@@ -371,7 +400,7 @@ int getPawnNodeIndex(list *boardCells, char pawn) {
     
     // Iterates over the board cells until it finds the pawn position
     for (node currentNode = *boardCells->head; currentNode.next != NULL; currentNode = *currentNode.next) {
-        if ((char) currentNode.item.jogador_peao[playerPos][pawnPos] == pawn) {
+        if ((char) currentNode.item.jogador_peao[playerPos][pawnPos] == TRUE) {
             return nodeIndex;
         }
         nodeIndex++;
