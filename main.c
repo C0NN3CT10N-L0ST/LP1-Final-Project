@@ -580,7 +580,7 @@ void makePlay(list *boardCells, char pawn, int amount) {
    // Sets 'currentNode' to the first node of the board
    currentNode = boardCells->head;
    
-    for (currentIndex = 0; currentIndex < totalCells && placesMoved > 0; currentIndex++) {
+    for (currentIndex = 0; currentIndex < totalCells && placesMoved >= 0; currentIndex++) {
         if (currentIndex > pawnCurrentPos) {
             // Checks if the current node has any of the opponnent players pawns
             for (int symbol = 0; symbol < 4; symbol++) {
@@ -597,9 +597,12 @@ void makePlay(list *boardCells, char pawn, int amount) {
         currentNode = currentNode->next;
     }
 
+    // Sets the node to the beginnig of the linked list again
+    currentNode = boardCells->head;
+
     // If its P2 and there's still cells to 'clear' we need to iterate starting at index 0 again
     if (placesMoved > 0 && adversaryPlayerIndex == 1) {
-        for (currentIndex = 0; currentIndex <= totalCells / 2 && placesMoved > 0; currentIndex++) {
+        for (currentIndex = 0; currentIndex <= totalCells / 2 && placesMoved >= 0; currentIndex++) {
             // Checks if the current node has any of the opponnent players pawns
             for (int symbol = 0; symbol < 4; symbol++) {
                 if (currentNode->item.jogador_peao[adversaryPlayerIndex][symbol] == TRUE) {
