@@ -20,6 +20,7 @@ int checkGameWin(list *boardCells, int totalCells);
 int getPawnIndex(char pawn);
 int getPawnNodeIndex(list *boardCells, char pawn);
 void movePawn(list *boardCells, char pawn, int pawnIndex, int srcIndex, int destIndex);
+void resetAdversaryPawn(list *boardCells, char pawn, int player, int pawnSrcIndex);
 void makePlay(list *boardCells, char pawn, int amount);
 bool pawnCompletesLapInCurrentPlay(int player, int totalCells, int srcIndex, int destIndex, int finalDestIndex);
 bool isPawnMovable(char pawn, list *boardCells, bool player);
@@ -458,6 +459,42 @@ void movePawn(list *boardCells, char pawn, int pawnIndex, int srcIndex, int dest
     }
 }
 
+void resetAdversaryPawn(list *boardCells, char pawn, int player, int pawnSrcIndex) {
+    int playerHome;  // Stores player home node index
+    int totalCells = boardCells->length;  // Total amount of board cells
+    char playerSymbols[10];  // Stores the symbols for the current player
+    int pawnIndex;  // Stores the index of the pawn in 'playerSymbols'
+    node *currentNode;  // Store the current node being checked
+
+    if (player == 0) {
+        playerHome = 0;
+        strcpy(playerSymbols, SYMBOLS_J1);
+    } else {
+        playerHome = totalCells / 2;
+        strcpy(playerSymbols, SYMBOLS_J2);
+    }
+
+    // Gets pawn index
+    pawnIndex = getPawnIndex(pawn);
+
+    currentNode = boardCells->head;
+
+    for (int nodeIndex = 0; nodeIndex < totalCells; nodeIndex++) {
+        // Removes pawn from its current place
+        if (nodeIndex == pawnSrcIndex) {
+            currentNode->item.jogador_peao[player][pawnIndex] = FALSE;
+        }
+
+        // Adds pawn to its home cell
+        if (nodeIndex == playerHome) {
+            currentNode->item.jogador_peao[player][pawnIndex] = TRUE;
+        }
+
+        // Gets next node
+        currentNode = currentNode->next;
+    }
+}
+
 /**
  * @brief Makes the play based on the given pawn and the amount of cells it should advance.
  * @param boardCells Linked list with board cells
@@ -467,9 +504,14 @@ void movePawn(list *boardCells, char pawn, int pawnIndex, int srcIndex, int dest
 void makePlay(list *boardCells, char pawn, int amount) {
     int playerIndex;
     int homeOpponent;
-    int currentIndex = 0;  // Stores current node index
+    int adversaryPlayerIndex;
+    node *currentNode;  // Stores the pointer of the current node being checked
+    int currentIndex;  // Stores current node index
     int pawnIndex;  // Stores the index of the pawn in the cell
     char playerSymbols[10];  // Stores string with player symbols
+    char adversarySymbols[10];  // Stores string with adversary symbols
+    int placesMoved;  // Stores the number of places the current pawn will be moved
+    int totalCells = boardCells->length;  // Stores the number of total board cells
 
     // Gets current pawn node index
     int pawnCurrentPos = getPawnNodeIndex(boardCells, pawn);
@@ -478,12 +520,17 @@ void makePlay(list *boardCells, char pawn, int amount) {
     if (pawn == 'a' || pawn == 'b' || pawn == 'c' || pawn == 'd') {
         playerIndex = 0;
         strcpy(playerSymbols, SYMBOLS_J1);
+        strcpy(adversarySymbols, SYMBOLS_J2);
         homeOpponent = boardCells->length / 2;
     } else {
         playerIndex = 1;
         strcpy(playerSymbols, SYMBOLS_J2);
+        strcpy(adversarySymbols, SYMBOLS_J1);
         homeOpponent = 0;
     }
+
+    // Sets 'adversaryPlayerIndex'
+    adversaryPlayerIndex = playerIndex == 0 ? 1 : 0;
 
     // Gets pawn index in the cell
     pawnIndex = getPawnIndex(pawn);
@@ -491,21 +538,81 @@ void makePlay(list *boardCells, char pawn, int amount) {
     // Moves the chosen 'pawn' to its destination based on 'amount' (dices value)
     movePawn(boardCells, pawn, pawnIndex, pawnCurrentPos, pawnCurrentPos + amount);
 
+    // Sets number of placed the pawn moved
+    if (playerIndex == 0) {  // P1
+        placesMoved = pawnCurrentPos + amount >= totalCells ? totalCells - pawnCurrentPos : amount;
+    } else {  // P2
+        // Case: current pawn index is between 0 (inclusive) and home (exclusive)
+        if (pawnCurrentPos >= 0 && pawnCurrentPos < totalCells / 2) {
+            // If the new pawn position is beyond board length
+            if (pawnCurrentPos + amount >= totalCells / 2) {
+                // 'placesMoved' is the index of P2 home less the current position index
+                placesMoved = totalCells / 2 - pawnCurrentPos;
+            } else {  // New pawn position is within board length
+                placesMoved = amount;
+            }
+        } else {  // Case: current pawn index is between home (inclusive) and board length
+            // If the new pawn index is beyond the board length
+            if (pawnCurrentPos + amount >= totalCells) {
+                placesMoved = totalCells - pawnCurrentPos;
+
+                // Adds the left over
+                // First we check if what's left is enough to complete a lap with the current pawn
+                if (amount - (totalCells - pawnCurrentPos) >= totalCells / 2) {
+                    // If it is, we add the amount needed to complete the lap to 'placedMoved'
+                    placesMoved += totalCells / 2;
+                } else {
+                    // If not, we just add whatever amount was left over
+                    placesMoved += amount - (totalCells - pawnCurrentPos);
+                }
+            } else {
+                placesMoved = amount;
+            }
+        }
+    }
+
     /* 
         Checks every board cell that the current pawn will go through.
         If the cell is not a safe cell, moves all the other player
         cells to his home cell.
     */
-    for (node *currentNode = boardCells->head; currentNode->next != NULL; currentNode = currentNode->next) {
-        if (currentIndex > pawnCurrentPos && currentIndex <= pawnCurrentPos + amount) {
+
+   // Sets 'currentNode' to the first node of the board
+   currentNode = boardCells->head;
+   
+    for (currentIndex = 0; currentIndex < totalCells && placesMoved > 0; currentIndex++) {
+        if (currentIndex > pawnCurrentPos) {
             // Checks if the current node has any of the opponnent players pawns
             for (int symbol = 0; symbol < 4; symbol++) {
-                if (currentNode->item.jogador_peao[playerIndex][symbol] == TRUE) {
-                    //movePawn(boardCells, playerSymbols[symbol+1], symbol, currentIndex, homeOpponent);
+                if (currentNode->item.jogador_peao[adversaryPlayerIndex][symbol] == TRUE) {
+                    // movePawn(boardCells, playerSymbols[symbol+1], symbol, currentIndex, homeOpponent);
+                    resetAdversaryPawn(boardCells, adversarySymbols[symbol+1], adversaryPlayerIndex, currentIndex);
                 }
             }
+            
+            placesMoved--;
         }
-        currentIndex++;
+        
+        // Gets next node
+        currentNode = currentNode->next;
+    }
+
+    // If its P2 and there's still cells to 'clear' we need to iterate starting at index 0 again
+    if (placesMoved > 0 && adversaryPlayerIndex == 1) {
+        for (currentIndex = 0; currentIndex <= totalCells / 2 && placesMoved > 0; currentIndex++) {
+            // Checks if the current node has any of the opponnent players pawns
+            for (int symbol = 0; symbol < 4; symbol++) {
+                if (currentNode->item.jogador_peao[adversaryPlayerIndex][symbol] == TRUE) {
+                    //movePawn(boardCells, playerSymbols[symbol+1], symbol, currentIndex, homeOpponent);
+                    resetAdversaryPawn(boardCells, adversarySymbols[symbol+1], adversaryPlayerIndex, currentIndex);
+                }
+            }
+            
+            placesMoved--;
+            
+            // Gets next node
+            currentNode = currentNode->next;
+        }
     }
 }
 
