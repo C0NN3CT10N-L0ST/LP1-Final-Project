@@ -480,6 +480,14 @@ void movePawn(list *boardCells, char pawn, int pawnIndex, int srcIndex, int dest
     }
 }
 
+/**
+ * @brief Resets the adversary pawn by removing it from its current place
+ * and moving it back to its home cell.
+ * @param boardCells Linked list with board cells
+ * @param pawn The given pawn
+ * @param player The player who owns the pawn ('0' - P1, '1' - P2)
+ * @param pawnSrcIndex The current node index in which the pawn currently is
+ */
 void resetAdversaryPawn(list *boardCells, char pawn, int player, int pawnSrcIndex) {
     int playerHome;  // Stores player home node index
     int totalCells = boardCells->length;  // Total amount of board cells
