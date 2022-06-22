@@ -37,6 +37,7 @@ int main(int argc, char const *argv[])
     char inputOption;  // Stores user input option
     bool player1;  // Holds the player for the current play
     unsigned int dicesValue;  // Holds dices value for each move
+    int gameOver;  // Holds the return of the 'checkGameWin' function
 
     // Initializes random seed
     srand(1);
@@ -86,6 +87,24 @@ int main(int argc, char const *argv[])
 
     // Game Loop
     do {
+        /* 
+            Checks if game is over (i.e. if a player won)
+            It it is, prints the winner and exits program
+        */
+        gameOver = checkGameWin(&boardCells, totalCells);
+
+        // Checks if P1 won
+        if (gameOver == 1) {
+            puts(PL1_WINS);
+            return 0;
+        }
+
+        // Checks if P2 won
+        if (gameOver == 1) {
+            puts(PL2_WINS);
+            return 0;
+        }
+
         // Prints current player move
         if (player1) {
             puts(PL1_MOVE);
@@ -106,7 +125,9 @@ int main(int argc, char const *argv[])
                 break;
 
             case 's':
-                // Skips
+                // Prints end game message and exits
+                puts("Fim do jogo");
+                // Skips to the end
                 break;
             
             default:
