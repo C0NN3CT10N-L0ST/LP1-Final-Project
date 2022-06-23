@@ -439,7 +439,6 @@ void movePawn(list *boardCells, char pawn, int pawnIndex, int srcIndex, int dest
     int homeP1 = 0;
     int homeP2 = boardCells->length / 2;
     int totalCells = boardCells->length;
-    int destIndexP2;
     int finalDestIndex = destIndex;
     bool completesLap;
 
@@ -452,8 +451,11 @@ void movePawn(list *boardCells, char pawn, int pawnIndex, int srcIndex, int dest
 
     // Calculates destination index for P2
     if (playerIndex == 1) {
-        destIndexP2 = destIndex >= totalCells ? destIndex - totalCells : destIndex;
-        finalDestIndex = destIndexP2;
+        if (srcIndex >= 0 && srcIndex < homeP2) {
+            finalDestIndex = destIndex > homeP2 ? homeP2 : destIndex;
+        } else {
+            finalDestIndex = destIndex >= totalCells ? destIndex - totalCells : destIndex;
+        }
     }
 
     // Checks if pawn completes lap in current play
@@ -615,14 +617,14 @@ void makePlay(list *boardCells, char pawn, int amount) {
     */
 
    // Sets 'currentNode' to the first node of the board
+
    currentNode = boardCells->head;
    
-    for (currentIndex = 0; currentIndex < totalCells && placesMoved >= 0; currentIndex++) {
+    for (currentIndex = 0; currentIndex < totalCells && placesMoved > 0; currentIndex++) {
         if (currentIndex > pawnCurrentPos) {
             // Checks if the current node has any of the opponnent players pawns
             for (int symbol = 0; symbol < 4; symbol++) {
                 if (currentNode->item.jogador_peao[adversaryPlayerIndex][symbol] == TRUE) {
-                    // movePawn(boardCells, playerSymbols[symbol+1], symbol, currentIndex, homeOpponent);
                     resetAdversaryPawn(boardCells, adversarySymbols[symbol+1], adversaryPlayerIndex, currentIndex);
                 }
             }
@@ -638,12 +640,11 @@ void makePlay(list *boardCells, char pawn, int amount) {
     currentNode = boardCells->head;
 
     // If its P2 and there's still cells to 'clear' we need to iterate starting at index 0 again
-    if (placesMoved > 0 && adversaryPlayerIndex == 1) {
-        for (currentIndex = 0; currentIndex <= totalCells / 2 && placesMoved >= 0; currentIndex++) {
+    if (placesMoved > 0 && playerIndex == 1) {
+        for (currentIndex = 0; currentIndex <= totalCells / 2 && placesMoved > 0; currentIndex++) {
             // Checks if the current node has any of the opponnent players pawns
             for (int symbol = 0; symbol < 4; symbol++) {
                 if (currentNode->item.jogador_peao[adversaryPlayerIndex][symbol] == TRUE) {
-                    //movePawn(boardCells, playerSymbols[symbol+1], symbol, currentIndex, homeOpponent);
                     resetAdversaryPawn(boardCells, adversarySymbols[symbol+1], adversaryPlayerIndex, currentIndex);
                 }
             }
