@@ -336,7 +336,6 @@ void resetAdversaryPawn(list *boardCells, char pawn, int player, int pawnSrcInde
  */
 void makePlay(list *boardCells, char pawn, int amount) {
     int playerIndex;
-    int homeOpponent;
     int adversaryPlayerIndex;
     node *currentNode;  // Stores the pointer of the current node being checked
     int currentIndex;  // Stores current node index
@@ -349,17 +348,15 @@ void makePlay(list *boardCells, char pawn, int amount) {
     // Gets current pawn node index
     int pawnCurrentPos = getPawnNodeIndex(boardCells, pawn);
 
-    // Gets player index based on pawn, sets 'playerSymbols' based on it, as well as 'homeOpponent'
+    // Gets player index based on pawn, sets 'playerSymbols' based on it
     if (pawn == 'a' || pawn == 'b' || pawn == 'c' || pawn == 'd') {
         playerIndex = 0;
         strcpy(playerSymbols, SYMBOLS_J1);
         strcpy(adversarySymbols, SYMBOLS_J2);
-        homeOpponent = boardCells->length / 2;
     } else {
         playerIndex = 1;
         strcpy(playerSymbols, SYMBOLS_J2);
         strcpy(adversarySymbols, SYMBOLS_J1);
-        homeOpponent = 0;
     }
 
     // Sets 'adversaryPlayerIndex'
