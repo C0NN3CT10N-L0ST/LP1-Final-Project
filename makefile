@@ -6,7 +6,7 @@ OBJS = $(patsubst %.c, %.o, $(SRCS))
 
 main: $(OBJS)
 	@echo "Compiling program..."
-	$(CC) $(CFLAGS) main.c board.c -o main -lm
+	$(CC) $(CFLAGS) main.c board.c engine.c -o main -lm
 	@echo "Compilation complete!"
 
 clean:
