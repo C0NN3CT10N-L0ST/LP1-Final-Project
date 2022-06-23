@@ -195,8 +195,16 @@ int getSafeCellsFromConfigFile(char *fileName, int *safeCells) {
     printf("fich %s\n", fileName);
 
     // Reads all numbers from config file and stores them in 'safeCells'
-    while (fscanf(fp, "%d", &numberRead) != EOF && numberRead < MAX_CELLS) {
-        safeCells[numberRead] = 1;
+    while (!feof(fp)) {
+        if (fscanf(fp, "%d", &numberRead) != 1) {
+            // Prints ERROR message and breaks the loop in case the read value is not valid
+            printf("%s", FILE_ERR2);
+            break;
+        }
+        
+        if (numberRead < MAX_CELLS) {
+            safeCells[numberRead] = 1;
+        }
     }
 
     // Closes file stream
