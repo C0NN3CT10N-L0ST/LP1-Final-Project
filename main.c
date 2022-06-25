@@ -27,6 +27,8 @@ int main(int argc, char const *argv[])
     bool player1;  // Holds the player for the current play
     unsigned int dicesValue;  // Holds dices value for each move
     int gameOver;  // Holds the return of the 'checkGameWin' function
+    bool rollDices = true;  // Whether dices should be rolled again or not
+    bool printBoard = true;  // Whether board should be printed or not
 
     // Initializes random seed
     srand(1);
@@ -102,7 +104,10 @@ int main(int argc, char const *argv[])
         }
 
         // Rolls dices for current player move and prints the value
-        dicesValue = rolldice(2);
+        if (rollDices) {
+            dicesValue = rolldice(2);
+            rollDices = true;
+        }
         printf("%s%d\n", PL_DICE, dicesValue);
         
         printf(">");  // Input cursor
@@ -111,11 +116,15 @@ int main(int argc, char const *argv[])
         switch (inputOption) {
             case 'h':
                 showMenu();
+                rollDices = false;
+                printBoard = false;
                 break;
 
             case 's':
                 // Prints end game message and exits
                 puts("Fim do jogo");
+                // Do not print board before exiting game
+                printBoard = false;
                 // Skips to the end
                 break;
             
@@ -129,15 +138,18 @@ int main(int argc, char const *argv[])
                 } else {
                     // Invalid option ERROR message
                     puts(INVAL_MOVE);
+                    rollDices = false;
+                    printBoard = false;
                 }
             
                 break;
         }
 
-        // Prints the board again after the play
-        if (inputOption != 's') {
+        // Prints the board again after the play or not
+        if (printBoard) {
             boardPrint(linesNum, columnsNum, boardCells, boardPresentationMode);  // Prints board
         }
+        printBoard = true;
 
     } while (inputOption != 's');
     
