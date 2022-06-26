@@ -20,6 +20,8 @@ int main(int argc, char const *argv[])
     /* Program variables */
     // Default values for 'Board Presentation Mode', 'Number of Lines' and 'Number of Columns'
     unsigned int boardPresentationMode = 0, linesNum = 3, columnsNum = 7;
+    long int argConversionResult;  // Variable used to get convert cli args to int
+    char *tempArg;  // Variable used to get convert cli args to int
     int safeCells[MAX_CELLS] = {0};  // Stores the safe cells read from the config file
     unsigned int totalCells;  // Number of total cells
     list boardCells;  // List struct to store all board cells data
@@ -36,18 +38,36 @@ int main(int argc, char const *argv[])
     // Gets program args and checks if they're valid
     for (int i = 1; i < argc; i++) {
         // Checks if 'Board Presentation Mode' argument is set and valid
-        if (i == 1 && (atoi(argv[i]) == 0 || atoi(argv[i]) == 1)) {
-            boardPresentationMode = atoi(argv[i]);
+        if (i == 1) {
+            argConversionResult = argv[i][0] == '0' || argv[i][0] == '1' ? argv[i][0] - '0' : -1;
+            if (argConversionResult == 0 || argConversionResult == 1) {
+                boardPresentationMode = argConversionResult;
+            } else {
+                puts(INVAL_PARAMS);
+                return 0;
+            }
         }
 
         // Checks if the 'Number of lines' is set and valid
-        if (i == 2 && atoi(argv[i]) >= MIN_ROWS && atoi(argv[i]) % 2 != 0) {
-            linesNum = atoi(argv[i]);
+        if (i == 2) {
+            argConversionResult = strtoul(argv[i], &tempArg, 10);
+            if (argConversionResult >= MIN_ROWS && argConversionResult % 2 != 0) {
+                linesNum = argConversionResult;
+            } else {
+                puts(INVAL_PARAMS);
+                return 0;
+            }
         }
 
         // Checks if the 'Number of Columns' is set and valid
-        if (i == 3 && atoi(argv[i]) > MIN_COLS) {
-            columnsNum = atoi(argv[i]);
+        if (i == 3) {
+            argConversionResult = strtoul(argv[i], &tempArg, 10);
+            if (argConversionResult > MIN_COLS) {
+                columnsNum = argConversionResult;
+            } else {
+                puts(INVAL_PARAMS);
+                return 0;
+            }
         }
 
         // Checks if the 'Configuration File' is present and reads its content
@@ -183,24 +203,25 @@ int getSafeCellsFromConfigFile(char *fileName, int *safeCells) {
     FILE *fp;
     int numberRead;
 
+    // Prints message before opening the file to be read
+    printf("fich %s\n", fileName);
+
     // Opens config file in 'read' mode
     fp = fopen(fileName, "r");
 
     // Checks for file read errors
     if (fp == NULL) {
         fputs(FILE_ERR1, stdout);
+        fputs(INVAL_PARAMS, stdout);
         return 1;
     }
-
-    // Prints message upon opening the file to be read
-    printf("fich %s\n", fileName);
 
     // Reads all numbers from config file and stores them in 'safeCells'
     while (!feof(fp)) {
         if (fscanf(fp, "%d", &numberRead) != 1) {
             // Prints ERROR message and breaks the loop in case the read value is not valid
             printf("%s", FILE_ERR2);
-            break;
+            return 1;
         }
         
         if (numberRead < MAX_CELLS) {
