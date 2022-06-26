@@ -138,13 +138,13 @@ int checkGameWin(list *boardCells, int totalCells) {
 
     node currentNode = *boardCells->head;  // Holds current node being checked
 
-    for (int player = homeP1; player <= homeP2; player++) {
+    for (int home = homeP1; home <= homeP2; home++) {
         for (int pawnIdx = 0; pawnIdx < 4; pawnIdx++) {
-            if (player == 0 && currentNode.item.jogador_peao[player][pawnIdx] != WIN) {
+            if (home == homeP1 && currentNode.item.jogador_peao[0][pawnIdx] != WIN) {
                 p1Won = false;
             }
 
-            if (player == 1 && currentNode.item.jogador_peao[player][pawnIdx] != WIN) {
+            if (home == homeP2 && currentNode.item.jogador_peao[1][pawnIdx] != WIN) {
                 p2Won = false;
             }
         }

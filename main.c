@@ -111,7 +111,7 @@ int main(int argc, char const *argv[])
         }
 
         // Checks if P2 won
-        if (gameOver == 1) {
+        if (gameOver == 2) {
             puts(PL2_WINS);
             return 0;
         }
