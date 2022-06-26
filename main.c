@@ -20,7 +20,7 @@ int main(int argc, char const *argv[])
     /* Program variables */
     // Default values for 'Board Presentation Mode', 'Number of Lines' and 'Number of Columns'
     unsigned int boardPresentationMode = 0, linesNum = 3, columnsNum = 7;
-    long int argConversionResult;  // Variable used to get convert cli args to int
+    unsigned long int argConversionResult;  // Variable used to get convert cli args to int
     char *tempArg;  // Variable used to get convert cli args to int
     int safeCells[MAX_CELLS] = {0};  // Stores the safe cells read from the config file
     unsigned int totalCells;  // Number of total cells
@@ -218,9 +218,10 @@ int getSafeCellsFromConfigFile(char *fileName, int *safeCells) {
 
     // Reads all numbers from config file and stores them in 'safeCells'
     while (!feof(fp)) {
-        if (fscanf(fp, "%d", &numberRead) != 1) {
+        if (fscanf(fp, "%d", &numberRead) == 0) {
             // Prints ERROR message and breaks the loop in case the read value is not valid
             printf("%s", FILE_ERR2);
+            puts(INVAL_PARAMS);
             return 1;
         }
         
