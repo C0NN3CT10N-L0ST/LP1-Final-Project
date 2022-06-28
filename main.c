@@ -236,6 +236,11 @@ int getSafeCellsFromConfigFile(char *fileName, int *safeCells) {
         
         if (numberRead < MAX_CELLS) {
             safeCells[numberRead] = 1;
+        } else {
+            // Prints ERROR message in case the number read is greater the the max number of cells
+            printf("%s", FILE_ERR2);
+            puts(INVAL_PARAMS);
+            return 1;
         }
     }
 
