@@ -13,6 +13,7 @@
 
 void showMenu();
 int getSafeCellsFromConfigFile(char *fileName, int *safeCells);
+void freeBoardCells(list* boardCells);
 
 
 int main(int argc, char const *argv[])
@@ -106,13 +107,19 @@ int main(int argc, char const *argv[])
 
         // Checks if P1 won
         if (gameOver == 1) {
+            // Frees all mem allocs related to board
+            freeBoardCells(&boardCells);
             puts(PL1_WINS);
+            puts(EXIT_MSG);
             return 0;
         }
 
         // Checks if P2 won
         if (gameOver == 2) {
+            // Frees all mem allocs related to board
+            freeBoardCells(&boardCells);
             puts(PL2_WINS);
+            puts(EXIT_MSG);
             return 0;
         }
 
@@ -128,7 +135,7 @@ int main(int argc, char const *argv[])
             dicesValue = rolldice(2);
             rollDices = true;
         }
-        printf("%s%d\n", PL_DICE, dicesValue);
+        printf("%s %d\n", PL_DICE, dicesValue);
         
         printf(">");  // Input cursor
         scanf(" %c", &inputOption);  // Reads user input
@@ -142,9 +149,11 @@ int main(int argc, char const *argv[])
 
             case 's':
                 // Prints end game message and exits
-                puts("Fim do jogo");
+                puts(EXIT_MSG);
                 // Do not print board before exiting game
                 printBoard = false;
+                // Frees all mem allocs related to board
+                freeBoardCells(&boardCells);
                 // Skips to the end
                 break;
             
@@ -233,4 +242,23 @@ int getSafeCellsFromConfigFile(char *fileName, int *safeCells) {
     // Closes file stream
     fclose(fp);
     return 0;
+}
+
+/**
+ * @brief Frees all memory allocations related to the board nodes.
+ * @param boardCells Linked list with board cells
+ */
+void freeBoardCells(list* boardCells) {
+    node *currentNode = boardCells->head;  // Stores current node
+    node *nextNode = currentNode->next;  // Stores next node
+    
+    for (int cell = 0; cell < boardCells->length; cell++) {
+        free(currentNode);
+
+        if (cell != boardCells->length - 1) {
+            // Updates 'currentNode' and 'nextNode'
+            currentNode = nextNode;
+            nextNode = currentNode->next;
+        }
+    }
 }
