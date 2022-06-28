@@ -8,7 +8,7 @@
 
 /**
  * @brief Initializes the board cells' list
- * @param boardCells The list that holds the board cells
+ * @param boardCells Linked list with board cells
  */
 void initializeCellsList(list *boardCells) {
     boardCells->head = NULL;
@@ -18,7 +18,7 @@ void initializeCellsList(list *boardCells) {
 
 /**
  * @brief Inserts a new board cell into the board cells' linked list.
- * @param boardCells The board cells list
+ * @param boardCells Linked list with board cells
  * @param cell The cell to be inserted
  * @return Returns 0 on 'SUCCESS' and 1 on 'FAILURE'
  */
@@ -49,57 +49,52 @@ int boardSetup(list *boardCells, int *safeCells, int totalCells) {
     for (int cellIndex = 0; cellIndex < totalCells; cellIndex++) {
         int letterIdx;
         node *cell = (node*) malloc(sizeof(node));  // Creates a new 'node'
-        casa *place = (casa*) malloc(sizeof(casa));  // Creates a new 'casa' for the node
 
         // Checks if an ERROR ocurred while allocating memory (i.e. out of memory)
-        if (cell == NULL || place == NULL) {
+        if (cell == NULL) {
             return 1;
         }
 
         // Adds data to new place
         if (cellIndex == 0) {  // Initializes home cell for player 1
             for (letterIdx = 0; letterIdx <= 3; letterIdx++) {
-                place->jogador_peao[0][letterIdx] = TRUE;
-                place->jogador_peao[1][letterIdx] = FALSE;
+                cell->item.jogador_peao[0][letterIdx] = TRUE;
+                cell->item.jogador_peao[1][letterIdx] = FALSE;
             }
 
             // Sets home cells as safe cells
-            place->casaSegura = 1;
+            cell->item.casaSegura = 1;
 
         } else if (cellIndex == (totalCells / 2)) {  // Initializes home cell for player 2
             for (letterIdx = 0; letterIdx <= 3; letterIdx++) {
-                place->jogador_peao[1][letterIdx] = TRUE;
-                place->jogador_peao[0][letterIdx] = FALSE;
+                cell->item.jogador_peao[1][letterIdx] = TRUE;
+                cell->item.jogador_peao[0][letterIdx] = FALSE;
             }
 
             // Sets home cells as safe cells
-            place->casaSegura = TRUE;
+            cell->item.casaSegura = TRUE;
         } else {
             // Initializes safe cells given in the config file
             if (safeCells[cellIndex] == TRUE) {
-                place->casaSegura = TRUE;
+                cell->item.casaSegura = TRUE;
             } else {
-                place->casaSegura = FALSE;
+                cell->item.casaSegura = FALSE;
             }
 
             // Cleans all the other player cells
             for (letterIdx = 0; letterIdx <= 3; letterIdx++) {
-                place->jogador_peao[0][letterIdx] = FALSE;
-                place->jogador_peao[1][letterIdx] = FALSE;
+                cell->item.jogador_peao[0][letterIdx] = FALSE;
+                cell->item.jogador_peao[1][letterIdx] = FALSE;
             }
         }
 
         // Adds data to new cell
-        cell->item = *place;
         cell->next = NULL;
         
         // Insert new cell onto the board
         if (insertBoardCell(boardCells, cell) == 1) {
             return 1;
         }
-
-        // Frees memory from 'place'
-        free(place);
     }
 
     return 0;
