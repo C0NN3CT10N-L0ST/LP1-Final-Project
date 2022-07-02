@@ -13,7 +13,8 @@ In each play, when a pawn from a player overtakes a pawn from the adversary and 
 Cell* (explained below) the adversary pawn will *Catch a Cold* and will be returned to its home cell. After a pawn is
 returned to its home cell, it is able to be used again.</br>
 Some of the board cells are *Safe Cells*, which means that when pawns are on that cell they won't *Catch a Cold* in case
-they're overtaken by an opponent pawn (as a result they don't need to return to their home cell).
+they're overtaken by an opponent pawn (as a result they don't need to return to their home cell). Both players home
+cells are considered *Safe Cells*.
 
 ### The purpose of this game is to practice the following topics:
 * Variables
@@ -53,4 +54,17 @@ If no CLI args are given, the board must have the following default values:
     * The pawn can't be played again
     * The pawn is represented in its home cell as uppercase (to signal it has already completed a full lap)
 
-##
+## Command Line Arguments
+The number of CLI arguments may vary between 0 and 4. The arguments are given in the following order.
+1. **Board Presentation Mode (int)** - sets the board presentation mode to '0' (which is the default) or '1'. Option '1' prints
+   the board in a simplified version.
+2. **Number of lines (int)** - sets the number of board lines. The number of lines must be greater or equal to 3 and must
+   also be an odd number.
+3. **Number of columns (int)** - sets the number of board columns. The number of columns must be greater than 4.
+4. **Safe cells config file (string)** - the name of the config file which contains the numbers of the safe cells. File
+   format example:
+```
+3
+17
+34
+```
